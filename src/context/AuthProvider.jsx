@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import CircularProgress from '../components/CircularProgress';
 
 export const AuthContext = createContext();
 
@@ -24,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       });
       if (!res.ok) throw new Error('Not authenticated');
       const data = await res.json();
-      if (data && data.email && data.username) {
+      if (data.user) {
         setUser(data);
       } else {
         setUser(null);
@@ -39,7 +40,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUser();
-    // eslint-disable-next-line
   }, []);
 
   const login = async (email, password) => {
@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error(resData.message || 'Incorrect email or password');
       } else {
         setUser(resData);
+        document.cookie = `SubjectSwapLoginJWT=${resData.token}; path=/`;
         setError('');
       }
     } catch (err) {
@@ -108,5 +109,9 @@ export const AuthProvider = ({ children }) => {
     register
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {loading ? <div style={{marginTop: '20%'}}><CircularProgress /></div> : children}
+    </AuthContext.Provider>
+  );
 };

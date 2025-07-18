@@ -8,6 +8,7 @@ const CreateAccount = () => {
   const [error, setError] = useState(null);
   const [info, setInfo] = useState('');
   const [name, setName] = useState('');
+  const [localLoading, setLocalLoading] = useState(false);
   const navigate = useNavigate();
   const { register } = useAuth();
 
@@ -19,12 +20,15 @@ const CreateAccount = () => {
       setError('All fields are required.');
       return;
     }
+    setLocalLoading(true);
     try {
       const resp = await register(name, email, password);
       if (resp.message = 'Verification email sent') setInfo(`Check your email! You have ${resp.time_left} minutes to verify.`);
       // Optionally navigate or wait for verification
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLocalLoading(false);
     }
   };
 
@@ -61,7 +65,14 @@ const CreateAccount = () => {
             required
           />
         </div>
-        <button type="submit">Create Account</button>
+        <button type="submit">
+          Create Account
+          {localLoading && (
+            <span style={{ marginRight: '8px' }}>
+              <CircularProgress size={16} color='white' />
+            </span>
+          )}
+        </button>
       </form>
     </div>
   );

@@ -19,7 +19,6 @@ const App = () => {
           <Route path="/dashboard" element={<ProtectedRoute component={Dashboard} />} />
         </Routes>
     </AuthProvider>
-    
       </Router>
   );
 };
