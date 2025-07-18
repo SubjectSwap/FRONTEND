@@ -68,16 +68,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    try {
-      await fetch(`${backendUrl}/logout`, { method: 'POST', credentials: 'include' });
-    } catch {}
+    // try {
+    //   await fetch(`${backendUrl}/logout`, { method: 'POST', credentials: 'include' });
+    // } catch {}
+    document.cookie = 'SubjectSwapLoginJWT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     setUser(null);
     navigate('/login');
   };
 
   const register = async (username, email, password) => {
-  setError('');
-  setLoading(true);
+  // setError('');
   try {
     const res = await fetch(`${backendUrl}/create-account`, {
       method: 'POST',
@@ -93,8 +93,6 @@ export const AuthProvider = ({ children }) => {
   } catch (err) {
     setError(err.message || 'Account creation failed');
     throw err;
-  } finally {
-    setLoading(false);
   }
 };
 

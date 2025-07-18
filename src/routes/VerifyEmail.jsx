@@ -1,24 +1,19 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 
-const VerifyEmail = ({params}) => {
+const VerifyEmail = () => {
   const uuid = useParams().uuid;
   const [verification, setVerification] = useState(null);
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/verify-account/${uuid}`, {
+  useEffect(async () => {
+    try{
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/verify-account/${uuid}`, {
       method: 'POST'
-    })
-      .then((res) => {
-        if (!res.ok) setVerification(false);
-        return res.json();
-      })
-      .then((data) => {
-        setVerification(true);
-      })
-      .catch((err) => {
-        console.error(err);
-        setVerification(false);
-      });
+    });
+    if (!res.ok) setVerification(false);
+    else setVerification(true);
+    }catch (err) {
+      setVerification(false);
+    }
   }, []);
 
   return (

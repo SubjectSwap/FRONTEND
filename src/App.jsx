@@ -15,7 +15,7 @@ const App = () => {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/create-account" element={<CreateAccount />} />
-          <Route path="/verify-email/:uuid" element={<VerifyEmail />} />
+          <Route path="/verify-account/:uuid" element={<VerifyEmail />} />
           <Route path="/dashboard" element={<ProtectedRoute component={Dashboard} />} />
         </Routes>
     </AuthProvider>
