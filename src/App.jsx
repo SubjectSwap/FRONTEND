@@ -6,6 +6,7 @@ import Login from './routes/Login';
 import CreateAccount from './routes/CreateAccount';
 import VerifyEmail from './routes/VerifyEmail';
 import ProtectedRoute from './routes/ProtectedRoute';
+import Chat from './routes/sockets/Chat';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/verify-account/:uuid" element={<VerifyEmail />} />
           <Route path="/dashboard" element={<ProtectedRoute component={Dashboard} />} />
+          <Route path="/chat" element={<ProtectedRoute component={Chat} />} />
         </Routes>
     </AuthProvider>
       </Router>
