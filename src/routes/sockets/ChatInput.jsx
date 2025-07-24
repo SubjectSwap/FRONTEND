@@ -39,7 +39,7 @@ export default function ChatInput({ onSend, disabled }) {
       <button
         onClick={() => setMode(mode === 'text' ? 'file' : 'text')}
         style={{
-          background: '#075e54', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer'
+          background: '#010c6fff', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer'
         }}
         type="button"
         disabled={disabled || sending}
@@ -69,7 +69,7 @@ export default function ChatInput({ onSend, disabled }) {
       <button
         onClick={handleSend}
         style={{
-          background: '#25d366', color: '#fff', border: 'none', borderRadius: 4, padding: '8px 16px', cursor: 'pointer'
+          background: '#000638ff', color: '#fff', border: 'none', borderRadius: 4, padding: '8px 16px', cursor: 'pointer'
         }}
         type="button"
         disabled={disabled || sending || (mode === 'text' ? !text.trim() : !file)}

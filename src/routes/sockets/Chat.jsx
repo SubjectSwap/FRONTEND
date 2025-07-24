@@ -4,6 +4,7 @@ import CircularProgress from '../../components/CircularProgress';
 import { io } from 'socket.io-client';
 import SpecificChat from './SpecificChat';
 import ListChats from './ListChats';
+import { generateKeyPair, exportPublicKey } from './cryptoUtils';
 
 export default function Chat() {
   const { user } = useAuth();
@@ -13,6 +14,8 @@ export default function Chat() {
   const [name, setName] = useState('');
   const [profilePic, setProfilePic] = useState('');
   const [error, setError] = useState('');
+  const [keyPair, setKeyPair] = useState(null);
+  const [publicKeyB64, setPublicKeyB64] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -52,10 +55,29 @@ export default function Chat() {
     };
   }, [user]);
 
+  useEffect(() => {
+    generateKeyPair().then(async kp => {
+      setKeyPair(kp);
+      setPublicKeyB64(await exportPublicKey(kp.publicKey));
+    });
+  }, []);
+
   if (loading) return <CircularProgress size={32} />;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
-    to ? (<SpecificChat name={name} profilePic={profilePic} socket={socket} to={to} setTo={setTo} />) : (<ListChats setName={setName} setProfilePic={setProfilePic} setTo={setTo} />)
+    to ? (
+      <SpecificChat
+        name={name}
+        profilePic={profilePic}
+        socket={socket}
+        to={to}
+        setTo={setTo}
+        keyPair={keyPair}
+        publicKeyB64={publicKeyB64}
+      />
+    ) : (
+      <ListChats setName={setName} setProfilePic={setProfilePic} setTo={setTo} />
+    )
   );
 }
