@@ -5,21 +5,40 @@ import { io } from 'socket.io-client';
 import SpecificChat from './SpecificChat';
 import ListChats from './ListChats';
 import { generateKeyPair, exportPublicKey } from './cryptoUtils';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
-export default function Chat() {
+export default function ConnectChat() {
   const { user } = useAuth();
+  const {uuid} = useParams();
+  if (!uuid || uuid.trim() == '') return <Navigate to="/" replace={true} />;
+  const [to, setTo] = useState(null);
   const [socket, setSocket] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [to, setTo] = useState(null);
   const [name, setName] = useState('');
   const [profilePic, setProfilePic] = useState('');
   const [error, setError] = useState('');
   const [keyPair, setKeyPair] = useState(null);
   const [publicKeyB64, setPublicKeyB64] = useState('');
 
+  async function fetchExtraData() {
+    await fetch(import.meta.env.VITE_BACKEND_URL + '/chat/get_user_info', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ uuid }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setName(data.name);
+        setProfilePic(data.profilePic);
+        setTo(uuid);
+      });
+  }
+
   useEffect(() => {
     if (!user) return;
-
     setLoading(true);
     setError('');
 
@@ -40,9 +59,15 @@ export default function Chat() {
       reconnectionAttempts: 3,
     });
 
-    socketInstance.on('connect', () => {
+    socketInstance.on('connect', async () => {
       setSocket(socketInstance);
-      setLoading(false);
+      try{
+        await fetchExtraData();
+      } catch(e) {
+        setError('An Error Occurred');
+      } finally{
+        setLoading(false);
+      }
     });
 
     socketInstance.on('connect_error', (err) => {
@@ -66,7 +91,6 @@ export default function Chat() {
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
-    to ? (
       <SpecificChat
         name={name}
         profilePic={profilePic}
@@ -75,10 +99,7 @@ export default function Chat() {
         setTo={setTo}
         keyPair={keyPair}
         publicKeyB64={publicKeyB64}
-        needSetTo={true}
+        needSetTo={false}
       />
-    ) : (
-      <ListChats setName={setName} setProfilePic={setProfilePic} setTo={setTo} />
-    )
-  );
+    );
 }

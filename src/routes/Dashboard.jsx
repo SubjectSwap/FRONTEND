@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthProvider';
+import Match from './matchMakingPage/Match';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -8,7 +9,7 @@ const Dashboard = () => {
     <div>
       <h1>Dashboard</h1>
       <p>Welcome to your dashboard!</p>
-      {JSON.stringify(user.user)}
+      <Match />
       <br />
       <button onClick={logout}>Logout</button>
     </div>

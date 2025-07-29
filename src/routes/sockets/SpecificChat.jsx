@@ -3,8 +3,10 @@ import CircularProgress from '../../components/CircularProgress';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
 import { importPublicKey, decryptWithPrivateKey, encryptWithPublicKey } from './cryptoUtils';
+import { useNavigate } from 'react-router-dom';
 
-export default function SpecificChat({ socket, to, name, profilePic, setTo, keyPair, publicKeyB64 }) {
+export default function SpecificChat({ socket, to, name, profilePic, setTo, keyPair, publicKeyB64, needSetTo }) {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [wsConnected, setWsConnected] = useState(true);
@@ -112,7 +114,7 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
       <div style={{
         background: '#2b0085ff', color: '#fff', padding: 16, fontWeight: 600, fontSize: 18, justifyContent: 'left', display: 'flex'
       }}>
-        <button onClick={() => setTo(null)} style={{
+        <button onClick={needSetTo ? () => setTo(null) : () => navigate(-1)} style={{
           background: 'none', border: 'none', color: '#fff', fontSize: 18, marginRight: 12, cursor: 'pointer'
         }}>&larr;</button>
         <div style={{
