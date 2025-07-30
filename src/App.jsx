@@ -8,6 +8,7 @@ import VerifyEmail from './routes/VerifyEmail';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Chat from './routes/sockets/Chat';
 import ConnectChat from './routes/sockets/ConnectChat';
+import Match from './routes/matchMakingPage/Match';
 
 const App = () => {
   return (
@@ -18,10 +19,13 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/verify-account/:uuid" element={<VerifyEmail />} />
-          <Route path="/dashboard" element={<ProtectedRoute component={Dashboard} />} />
+          <Route path="/match" element={<ProtectedRoute component={Match} />} />
           <Route path="/chat" element={<ProtectedRoute component={Chat} />} />
           <Route path="/chat-to-connect/:uuid" element={<ProtectedRoute component={ConnectChat} />} />
-          
+          <Route path="/dashboard" />
+          <Route path="/forgot-password" />
+          <Route path="/change-password/:uuid" />
+          <Route path="/profile/:id" />
         </Routes>
     </AuthProvider>
       </Router>
