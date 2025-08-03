@@ -11,35 +11,17 @@ export default function ConnectChat() {
   const { user } = useAuth();
   const {uuid} = useParams();
   if (!uuid || uuid.trim() == '') return <Navigate to="/" replace={true} />;
-  const [to, setTo] = useState(null);
+  const [to, setTo] = useState(uuid);
   const [socket, setSocket] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [name, setName] = useState('');
-  const [profilePic, setProfilePic] = useState('');
   const [error, setError] = useState('');
   const [keyPair, setKeyPair] = useState(null);
   const [publicKeyB64, setPublicKeyB64] = useState('');
 
-  async function fetchExtraData() {
-    await fetch(import.meta.env.VITE_BACKEND_URL + '/chat/get_user_info', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ uuid }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setName(data.name);
-        setProfilePic(data.profilePic);
-        setTo(uuid);
-      });
-  }
-
   useEffect(() => {
     if (!user) return;
     setLoading(true);
+    console.log('Connecting to socket.io server...');
     setError('');
 
     // Get JWT cookie value
@@ -61,16 +43,12 @@ export default function ConnectChat() {
 
     socketInstance.on('connect', async () => {
       setSocket(socketInstance);
-      try{
-        await fetchExtraData();
-      } catch(e) {
-        setError('An Error Occurred');
-      } finally{
-        setLoading(false);
-      }
+      console.log('connected');
+      setLoading(false);
     });
 
     socketInstance.on('connect_error', (err) => {
+      console.log(`connect_error due to ${err.message}`);
       setError('An Error Occurred');
       setLoading(false);
     });
@@ -92,14 +70,10 @@ export default function ConnectChat() {
 
   return (
       <SpecificChat
-        name={name}
-        profilePic={profilePic}
         socket={socket}
         to={to}
-        setTo={setTo}
         keyPair={keyPair}
         publicKeyB64={publicKeyB64}
-        needSetTo={false}
       />
     );
 }

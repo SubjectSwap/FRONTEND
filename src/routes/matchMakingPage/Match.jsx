@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthProvider';
 import CircularProgress from '../../components/CircularProgress.jsx';
 import { BookOpen, Star, Languages } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import FilterSection from '../../components/FilterSection.jsx';
 
 export default function Match() {
   const { user } = useAuth();
@@ -12,6 +13,89 @@ export default function Match() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+
+  // Filtering Logic
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [selectedLearningSubjects, setSelectedLearningSubjects] = useState([]);
+  const [selectedTeachingSubjects, setSelectedTeachingSubjects] = useState([]);
+  const [filterLogic, setFilterLogic] = useState({
+    languages: 'AND',
+    learningSubjects: 'AND',
+    teachingSubjects: 'AND'
+  });
+
+    useEffect(() => {
+    if (selectedSubject) {
+      fetchMatches();
+    }
+  }, [selectedSubject]);
+
+  useEffect(() => {
+    filterCandidates();
+  }, [candidates, searchInput, selectedLanguages, selectedLearningSubjects, selectedTeachingSubjects, filterLogic]);
+
+  const filterCandidates = () => {
+    let filtered = [...candidates];
+
+    // Username search
+    if (searchInput) {
+      const searchLower = searchInput.toLowerCase();
+      filtered.sort((a, b) => {
+        const aMatch = a.username.toLowerCase().includes(searchLower);
+        const bMatch = b.username.toLowerCase().includes(searchLower);
+        if (aMatch && !bMatch) return -1;
+        if (!aMatch && bMatch) return 1;
+        return 0;
+      });
+      filtered = filtered.filter(candidate => 
+        candidate.username.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Language filter
+    if (selectedLanguages.length > 0) {
+      filtered = filtered.filter(candidate => {
+        if (!candidate.languages) return false;
+        const matches = selectedLanguages.every(lang => 
+          candidate.languages.includes(lang)
+        );
+        return filterLogic.languages === 'AND' ? matches :
+          selectedLanguages.some(lang => candidate.languages.includes(lang));
+      });
+    }
+
+    // Learning subjects filter
+    if (selectedLearningSubjects.length > 0) {
+      filtered = filtered.filter(candidate => {
+        if (!candidate.learningSubjects) return false;
+        const matches = selectedLearningSubjects.every(subject => 
+          candidate.learningSubjects.includes(subject)
+        );
+        return filterLogic.learningSubjects === 'AND' ? matches :
+          selectedLearningSubjects.some(subject => candidate.learningSubjects.includes(subject));
+      });
+    }
+
+    // Teaching subjects filter
+    if (selectedTeachingSubjects.length > 0) {
+      filtered = filtered.filter(candidate => {
+        if (!candidate.teachingSubjects) return false;
+        const matches = selectedTeachingSubjects.every(subject => 
+          candidate.teachingSubjects.some(ts => ts.subjectName === subject)
+        );
+        return filterLogic.teachingSubjects === 'AND' ? matches :
+          selectedTeachingSubjects.some(subject => 
+            candidate.teachingSubjects.some(ts => ts.subjectName === subject)
+          );
+      });
+    }
+
+    setFilteredCandidates(filtered);
+  };
+
+  // An enum of subjects
   const subjects = [
     'Physics', 'Mathematics', 'Chemistry', 'English', 'History',
     'Hindi', 'SST', 'Geography', 'Electrochemistry', 'Biology', 'Astrophysics',
@@ -36,7 +120,6 @@ export default function Match() {
   const fetchMatches = async () => {
     setLoading(true);
     setError('');
-    console.log(user);
     
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/matchmaking/match`, {
@@ -131,6 +214,74 @@ export default function Match() {
           </select>
         </div>
 
+        {/* Search and Filters Section */}
+        <div style={{
+          display: (loading || !candidates.length) ? 'none' : 'grid',
+          marginBottom: '2rem', 
+          backgroundColor: 'white', 
+          borderRadius: '0.5rem', 
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+          padding: '1.5rem'
+        }}>
+          {/* Search Input */}
+          <input
+            type="text"
+            placeholder="Search by Name..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{
+              width: '90%',
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.5rem',
+              outline: 'none',
+              fontSize: '1rem'
+            }}
+          />
+
+          {/* Advanced Filters */}
+          <details style={{ marginBottom: '1rem' }}>
+            <summary style={{
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: '500',
+              marginBottom: '1rem',
+              color: '#4f46e5'
+            }}>
+              Advanced Filters
+            </summary>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+              <FilterSection
+                title="Languages"
+                items={Array.from(new Set(candidates.flatMap(c => c.languages || [])))}
+                selectedItems={selectedLanguages}
+                setSelectedItems={setSelectedLanguages}
+                logic={filterLogic.languages}
+                onLogicChange={(value) => setFilterLogic(prev => ({ ...prev, languages: value }))}
+              />
+
+              <FilterSection
+                title="Learning Subjects"
+                items={Array.from(new Set(candidates.flatMap(c => c.learningSubjects || [])))}
+                selectedItems={selectedLearningSubjects}
+                setSelectedItems={setSelectedLearningSubjects}
+                logic={filterLogic.learningSubjects}
+                onLogicChange={(value) => setFilterLogic(prev => ({ ...prev, learningSubjects: value }))}
+              />
+
+              <FilterSection
+                title="Teaching Subjects"
+                items={Array.from(new Set(candidates.flatMap(c => c.teachingSubjects?.map(ts => ts.subjectName) || [])))}
+                selectedItems={selectedTeachingSubjects}
+                setSelectedItems={setSelectedTeachingSubjects}
+                logic={filterLogic.teachingSubjects}
+                onLogicChange={(value) => setFilterLogic(prev => ({ ...prev, teachingSubjects: value }))}
+              />
+            </div>
+          </details>
+        </div>
+
         {/* Loading State */}
         {loading && (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
@@ -159,7 +310,7 @@ export default function Match() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
             gap: '1.5rem'
           }}>
-            {candidates.map((candidate) => (
+            {filteredCandidates.map((candidate) => (
               <div 
                 key={candidate._id} 
                 style={{ 
@@ -339,7 +490,7 @@ export default function Match() {
         )}
 
         {/* Empty State */}
-        {!loading && !error && candidates.length === 0 && selectedSubject && (
+        {!loading && !error && filteredCandidates.length === 0 && selectedSubject && (
           <div style={{ 
             textAlign: 'center', 
             padding: '3rem',
@@ -352,7 +503,7 @@ export default function Match() {
               No matches found
             </h3>
             <p style={{ color: '#6b7280' }}>
-              Try selecting a different subject to find learning partners.
+              Try selecting a different combination to find learning partners.
             </p>
           </div>
         )}

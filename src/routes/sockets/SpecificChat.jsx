@@ -5,7 +5,7 @@ import ChatInput from './ChatInput';
 import { importPublicKey, decryptWithPrivateKey, encryptWithPublicKey } from './cryptoUtils';
 import { useNavigate } from 'react-router-dom';
 
-export default function SpecificChat({ socket, to, name, profilePic, setTo, keyPair, publicKeyB64, needSetTo }) {
+export default function SpecificChat({ socket, to, keyPair, publicKeyB64 }) {
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,17 +13,19 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
   const [showDisconnected, setShowDisconnected] = useState(false);
   const [archived, setArchived] = useState(false);
   const [serverPublicKey, setServerPublicKey] = useState(null);
+  const [isAMessageBeingSent, setIsAMessageBeingSent] = useState(false);
   const bottomRef = useRef(null);
 
   // Fetch previous chats
   useEffect(() => {
     if (!socket || !to || !keyPair || !publicKeyB64) return;
-
     setLoading(true);
     socket.emit('join_conversation', { to, publicKey: publicKeyB64 });
+    console.log("Emitted here");
     socket.emit('previous_chats', { to });
 
     const handlePreviousChats = async (data) => {
+      console.log("Previous chats received")
       setArchived(data.archived || false);
       // Import server public key
       if (data.server_public_key) {
@@ -50,6 +52,7 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
     };
 
     const handleMessageReceived = async (msg) => {
+      if(msg.byMe) setIsAMessageBeingSent(false);
       if (msg.content) {
         try {
           msg.content = await decryptWithPrivateKey(keyPair.privateKey, msg.content);
@@ -66,6 +69,9 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
       setShowDisconnected(true);
     };
 
+    socket.on('cantConnectWithSelf', () =>{
+      navigate('/chat');
+    })
     socket.on('previous_chats', handlePreviousChats);
     socket.on('message_received', handleMessageReceived);
     socket.on('disconnect', handleDisconnect);
@@ -77,13 +83,15 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
       socket.off('disconnect', handleDisconnect);
     };
     // eslint-disable-next-line
-  }, [socket, to]);
+  }, [socket, to, publicKeyB64]);
 
   const handleSend = async (msg) => {
+    if (isAMessageBeingSent) return;
     if (msg.type === 'text' && serverPublicKey) {
       msg.content = await encryptWithPublicKey(serverPublicKey, msg.content);
     }
     socket.emit('message_sent', { to, ...msg });
+    setIsAMessageBeingSent(true);
   };
 
   const scrollToBottom = () => {
@@ -94,7 +102,7 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100vh', background: '#f0e6feff'
+      display: 'flex', flexDirection: 'column', background: loading || '#f0e6feff', minHeight: '100vh'
     }}>
       {/* Modal for disconnect */}
       {showDisconnected && (
@@ -110,24 +118,15 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
           </div>
         </div>
       )}
-      {/* Header */}
-      <div style={{
-        background: '#2b0085ff', color: '#fff', padding: 16, fontWeight: 600, fontSize: 18, justifyContent: 'left', display: 'flex'
-      }}>
-        <button onClick={needSetTo ? () => setTo(null) : () => navigate(-1)} style={{
-          background: 'none', border: 'none', color: '#fff', fontSize: 18, marginRight: 12, cursor: 'pointer'
-        }}>&larr;</button>
+      {/* Between sending of messages */}
+      {isAMessageBeingSent && (
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(255, 255, 255, 0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
-          <img
-            src={profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name)}
-            alt={name}
-            style={{ width: 36, height: 36, borderRadius: '50%', marginRight: 8, verticalAlign: 'middle' }}
-          />
-          {name}
+          <CircularProgress />
         </div>
-      </div>
+      )}
       {/* Archiving */}
       {archived && (
         <div style={{
@@ -139,19 +138,17 @@ export default function SpecificChat({ socket, to, name, profilePic, setTo, keyP
       )}
       {/* Messages */}
       <div style={{
-        flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column'
+        flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', marginBottom: 10,
       }}>
         {loading
           ? <CircularProgress size={32} />
           : <ChatMessages messages={messages} bottomRef={bottomRef} />}
       </div>
       {/* Input */}
-      <div style={{ borderTop: '1px solid #ddd', background: '#f7f7f7ff', padding: 8 }}>
         <ChatInput
           onSend={handleSend}
-          disabled={!wsConnected}
+          disabled={!wsConnected || isAMessageBeingSent}
         />
-      </div>
     </div>
   );
 }

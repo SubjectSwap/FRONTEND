@@ -6,6 +6,11 @@ import SpecificChat from './SpecificChat';
 import ListChats from './ListChats';
 import { generateKeyPair, exportPublicKey } from './cryptoUtils';
 
+/**
+ * File Depriciated  
+ * i.e. might contain useful reusable code but  
+ *  is directly no longer in use
+ */
 export default function Chat() {
   const { user } = useAuth();
   const [socket, setSocket] = useState(null);

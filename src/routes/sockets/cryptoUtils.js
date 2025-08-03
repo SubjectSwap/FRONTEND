@@ -72,8 +72,6 @@ export async function encryptWithPublicKey(publicKey, message) {
 
 // Decrypt a base64 string with a private key (PEM or CryptoKey)
 export async function decryptWithPrivateKey(privateKey, encryptedBase64) {
- console.log("Private Key:", await exportPrivateKey(privateKey));
- console.log("Encrypted Base64:", encryptedBase64);
   let key = privateKey;
   if (typeof privateKey === "string") key = await importPrivateKey(privateKey);
   const encrypted = Uint8Array.from(window.atob(encryptedBase64), c => c.charCodeAt(0));

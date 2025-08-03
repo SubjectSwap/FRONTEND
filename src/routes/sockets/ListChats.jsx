@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import CircularProgress from '../../components/CircularProgress';
+import { useNavigate } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 
-function ListChats({ setName, setProfilePic, setTo }) {
+function ListChats() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Receive Previous Conversations
     let isMounted = true;
     setLoading(true);
     setError('');
@@ -51,9 +55,7 @@ function ListChats({ setName, setProfilePic, setTo }) {
         <div
           key={chat.convo_id}
           onClick={() => {
-            setName(chat.name);
-            setProfilePic(chat.profilePic);
-            setTo(chat.convo_id)
+            navigate('/chat-to-connect/'+chat.convo_id);
           }}
           style={{
             display: 'flex',
@@ -82,6 +84,34 @@ function ListChats({ setName, setProfilePic, setTo }) {
           <span style={{ fontWeight: 500, fontSize: 16 }}>{chat.name}</span>
         </div>
       ))}
+      {/* Floating Action Button */}
+      <button
+        style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          right: '1.5rem',
+          width: '3.5rem',
+          height: '3.5rem',
+          borderRadius: '50%',
+          backgroundColor: 'white',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          transition: 'transform 0.2s',
+          zIndex: 50,
+          border: 'none',
+          outline: 'none'
+        }}
+        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        onClick={() => {
+          navigate('/search')
+        }}
+      >
+        <Plus size={24} color="#374151" />
+      </button>
     </div>
   );
 }

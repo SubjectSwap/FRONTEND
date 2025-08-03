@@ -35,7 +35,9 @@ export default function ChatInput({ onSend, disabled }) {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    
+  <div style={{ borderTop: '1px solid #ddd', background: '#f7f7f7ff', padding: 8, position: 'fixed', width: '100%', bottom: 0  }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8}}>
       <button
         onClick={() => setMode(mode === 'text' ? 'file' : 'text')}
         style={{
@@ -77,5 +79,6 @@ export default function ChatInput({ onSend, disabled }) {
         {sending ? 'Sending...' : 'Send'}
       </button>
     </div>
+  </div>
   );
 }

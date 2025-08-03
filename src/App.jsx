@@ -6,9 +6,12 @@ import Login from './routes/Login';
 import CreateAccount from './routes/CreateAccount';
 import VerifyEmail from './routes/VerifyEmail';
 import ProtectedRoute from './routes/ProtectedRoute';
-import Chat from './routes/sockets/Chat';
 import ConnectChat from './routes/sockets/ConnectChat';
 import Match from './routes/matchMakingPage/Match';
+import ChatHeader from './routes/sockets/ChatHeader';
+import ListChats from './routes/sockets/ListChats';
+import Profile from './routes/Profile';
+import Search from './routes/search/Search';
 
 const App = () => {
   return (
@@ -20,12 +23,13 @@ const App = () => {
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/verify-account/:uuid" element={<VerifyEmail />} />
           <Route path="/match" element={<ProtectedRoute component={Match} />} />
-          <Route path="/chat" element={<ProtectedRoute component={Chat} />} />
-          <Route path="/chat-to-connect/:uuid" element={<ProtectedRoute component={ConnectChat} />} />
+          <Route path="/chat" element={<ProtectedRoute component={ListChats} />} />
+          <Route path="/chat-to-connect/:uuid" element={<ProtectedRoute component={ConnectChat} navbarAdditionContent={<ChatHeader />} />} />
           <Route path="/dashboard" />
           <Route path="/forgot-password" />
           <Route path="/change-password/:uuid" />
-          <Route path="/profile/:id" />
+          <Route path="/search" element={<Search />} />
+          <Route path="/profile/:id" element={<Profile />} />
         </Routes>
     </AuthProvider>
       </Router>
