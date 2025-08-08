@@ -45,69 +45,70 @@ const ProtectedRoute = ({ component: Component, navbarAdditionContent }) => {
             SubjectSwap
           </div>
 
-          {/* Navigation Links - Desktop */}
-          <div className="nav-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <NavTab to="/match" text="Match Now" />
-            <NavTab to="/edit-profile" text="Edit Profile" />
-            <NavTab to="/chat" text="Previous Chats" />
+           {/* Navigation Links - Desktop */}
+              <div className="nav-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+              <NavTab to="/dashboard" text="Dashboard" />
+              <NavTab to="/match" text="Match Now" />
+              <NavTab to="/edit-profile" text="Edit Profile" />
+              <NavTab to="/chat" text="Previous Chats" />
 
             {/* User Profile Section */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              paddingLeft: '1rem',
-              borderLeft: '1px solid #e5e7eb'
-            }}>
-              {/* User Avatar & Name */}
+             <div style={{
+               display: 'flex',
+               alignItems: 'center',
+               gap: '1rem',
+               paddingLeft: '1rem',
+               borderLeft: '1px solid #e5e7eb'
+             }}>
+            {/* User Avatar & Name */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <img
-                  src={user?.user?.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user?.username || 'User')}`}
-                  alt={user?.user?.username || 'User'}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '2px solid #e5e7eb'
-                  }}
-                />
-                <span style={{
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151'
-                }}>
-                  {user?.user?.username || 'User'}
-                </span>
-              </div>
-
-              {/* Logout Button */}
-              <button
-                onClick={logout}
-                style={{
-                  backgroundColor: '#fee2e2',
-                  color: '#b91c1c',
-                  border: '1px solid #fecaca',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#fecaca';
-                  e.target.style.borderColor = '#fca5a5';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#fee2e2';
-                  e.target.style.borderColor = '#fecaca';
-                }}
-              >
-                Logout
-              </button>
+              <img
+               src={user?.user?.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user?.username || 'User')}`}
+               alt={user?.user?.username || 'User'}
+               style={{
+               width: '32px',
+               height: '32px',
+               borderRadius: '50%',
+               objectFit: 'cover',
+               border: '2px solid #e5e7eb'
+              }}
+              />
+              <span style={{
+               fontSize: '0.875rem',
+               fontWeight: '500',
+               color: '#374151'
+              }}>
+              {user?.user?.username || 'User'}
+            </span>
             </div>
-          </div>
+
+            {/* Logout Button */}
+            <button
+            onClick={logout}
+            style={{
+            backgroundColor: '#fee2e2',
+            color: '#b91c1c',
+            border: '1px solid #fecaca',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.375rem',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+             e.target.style.backgroundColor = '#fecaca';
+             e.target.style.borderColor = '#fca5a5';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#fee2e2';
+              e.target.style.borderColor = '#fecaca';
+            }}
+            >
+           Logout
+          </button>
+       </div>
+      </div>
 
           {/* Mobile Menu Button */}
           <button 
@@ -144,6 +145,7 @@ const ProtectedRoute = ({ component: Component, navbarAdditionContent }) => {
             boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.1)'
           }}
         >
+          <NavTab to="/dashboard" text="Dashboard" />
           <NavTab to="/match" text="Match Now" />
           <NavTab to="/edit-profile" text="Edit Profile" />
           <NavTab to="/chat" text="Previous Chats" />

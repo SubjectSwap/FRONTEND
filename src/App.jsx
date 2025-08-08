@@ -12,6 +12,7 @@ import ChatHeader from './routes/sockets/ChatHeader';
 import ListChats from './routes/sockets/ListChats';
 import Profile from './routes/Profile';
 import Search from './routes/search/Search';
+import EditProfile from './routes/EditProfile';
 
 const App = () => {
   return (
@@ -25,7 +26,8 @@ const App = () => {
           <Route path="/match" element={<ProtectedRoute component={Match} />} />
           <Route path="/chat" element={<ProtectedRoute component={ListChats} />} />
           <Route path="/chat-to-connect/:uuid" element={<ProtectedRoute component={ConnectChat} navbarAdditionContent={<ChatHeader />} />} />
-          <Route path="/dashboard" />
+          <Route path="/dashboard" element={<ProtectedRoute component={Dashboard}/>} />
+          <Route path="/edit-Profile" element={<ProtectedRoute component={EditProfile} />} />
           <Route path="/forgot-password" />
           <Route path="/change-password/:uuid" />
           <Route path="/search" element={<Search />} />
