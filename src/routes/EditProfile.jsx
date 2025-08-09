@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
 import CircularProgress from '../components/CircularProgress';
-import { User, Mail, Lock, BookOpen, Languages, Plus, X, Save } from 'lucide-react';
+import { User, Lock, BookOpen, Languages, Plus, X, Save } from 'lucide-react';
 
 const EditProfile = () => {
   const { user, updateUser } = useAuth();
@@ -13,11 +13,10 @@ const EditProfile = () => {
   
   // Form states
   const [formData, setFormData] = useState({
+    fileObject: null,
     username: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    description: '',
+    profilePicUrl: '',
     languages: [],
     learningSubjects: [],
     teachingSubjects: []
@@ -28,6 +27,7 @@ const EditProfile = () => {
   const [newLearningSubject, setNewLearningSubject] = useState('');
   const [newTeachingSubject, setNewTeachingSubject] = useState('');
   const [newTeachingRating, setNewTeachingRating] = useState(5);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   // Available subjects
   const availableSubjects = [
@@ -44,15 +44,15 @@ const EditProfile = () => {
 
   useEffect(() => {
     if (user?.user) {
+      const filteredSubjects = user.user?.teachingSubjects?.filter(subject => subject.active);
       setFormData({
+        fileObject: null, // Assuming are not uploading a file yet
         username: user.user.username || '',
-        email: user.user.email || '',
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        profilePicUrl: user.user.profilePicUrl || '',
         languages: user.user.languages || [],
         learningSubjects: user.user.learningSubjects || [],
-        teachingSubjects: user.user.teachingSubjects || []
+        teachingSubjects: filteredSubjects || [],
+        description: user.user.description || ''
       });
     }
   }, [user]);
@@ -61,6 +61,33 @@ const EditProfile = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData(prev => ({
+            ...prev,
+            fileObject: {
+              filedata: { name: file.name },
+              buffer: reader.result
+            }
+          }));
+          setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+  };
+
+  const cancelUpload = () => {
+    setFormData(prev => ({
+      ...prev,
+      fileObject: null
+    }));
+    setPreviewUrl(null);
+  };
+
 
   const addLanguage = () => {
     if (newLanguage.trim() && !formData.languages.includes(newLanguage.trim())) {
@@ -97,12 +124,10 @@ const EditProfile = () => {
   };
 
   const addTeachingSubject = () => {
-    if (newTeachingSubject && !formData.teachingSubjects.some(ts => ts.subjectName === newTeachingSubject)) {
+    if (newTeachingSubject && newTeachingRating <=10 && newTeachingRating >=0 && !formData.teachingSubjects.some(ts => ts.subjectName === newTeachingSubject)) {
       const newSubject = {
         subjectName: newTeachingSubject,
-        selfRating: parseFloat(newTeachingRating),
-        totalReceivedRatings: 0,
-        noOfRatings: 0
+        selfRating: parseFloat(newTeachingRating)
       };
       setFormData(prev => ({
         ...prev,
@@ -125,39 +150,23 @@ const EditProfile = () => {
     setError('');
     setSuccess('');
 
-    // Validate passwords if changing
-    if (formData.newPassword) {
-      if (!formData.currentPassword) {
-        setError('Current password is required to set a new password');
-        return;
-      }
-      if (formData.newPassword !== formData.confirmPassword) {
-        setError('New passwords do not match');
-        return;
-      }
-      if (formData.newPassword.length < 6) {
-        setError('New password must be at least 6 characters long');
-        return;
-      }
-    }
-
     setLoading(true);
     try {
       const updateData = {
         username: formData.username,
-        email: formData.email,
+        description: formData.description,
         languages: formData.languages,
         learningSubjects: formData.learningSubjects,
         teachingSubjects: formData.teachingSubjects
       };
 
-      // Only include password fields if changing password
-      if (formData.newPassword) {
-        updateData.currentPassword = formData.currentPassword;
-        updateData.newPassword = formData.newPassword;
+      if (formData.fileObject) {
+        // Start here
+        // fileObject schema is like {filedata: {name: String (of file)}, buffer: made with help of new FileReader() such that it can be uploaded}
+        updateData.fileObject = formData.fileObject;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/update-profile`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/edit-profile`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -187,6 +196,9 @@ const EditProfile = () => {
         newPassword: '',
         confirmPassword: ''
       }));
+
+      // Reload the page if successful
+      window.location.reload();
 
     } catch (err) {
       setError(err.message || 'Error updating profile');
@@ -261,6 +273,69 @@ const EditProfile = () => {
               </h2>
             </div>
 
+            {/* Profile Pic */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+            <div style={{
+              position: 'relative',
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '3px solid #e5e7eb',
+              marginBottom: '1rem'
+            }}>
+              <img
+                src={previewUrl || formData.profilePicUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.username)}
+                alt="Profile"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+              <label style={{
+                position: 'absolute',
+                bottom: '0',
+                right: '0',
+                backgroundColor: '#2563eb',
+                color: 'white',
+                borderRadius: '50%',
+                padding: '0.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                />
+                <Plus size={20} />
+              </label>
+            </div>
+            {previewUrl && (
+              <button
+                type="button"
+                onClick={cancelUpload}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.375rem',
+                  padding: '0.5rem 1rem',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Cancel Upload
+              </button>
+            )}
+</div>
+
+
+            {/* Username */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
@@ -283,22 +358,25 @@ const EditProfile = () => {
                   }}
                 />
               </div>
-
+            </div>
+            
+            {/* Description */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Email
+                  Description
                 </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                <textarea
+                  type="text"
+                  name="description"
+                  value={formData.description}
                   onChange={handleInputChange}
-                  required
                   style={{
                     width: '100%',
                     padding: '0.75rem',
                     border: '1px solid #d1d5db',
                     borderRadius: '0.5rem',
+                    maxWidth: '100%',
                     fontSize: '1rem',
                     outline: 'none',
                     boxSizing: 'border-box'
@@ -316,14 +394,19 @@ const EditProfile = () => {
             padding: '2rem',
             marginBottom: '2rem'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', marginBottom: '1.5rem', flexDirection: 'column' }}>
+              <div style={{flexDirection: 'row', flex: 1, display: 'flex', alignItems: 'center'}}>
               <Lock size={24} color="#dc2626" />
               <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#374151', marginLeft: '0.5rem' }}>
                 Change Password
               </h2>
+              </div>
+              <Link to='/forgot-password' style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280', marginLeft: '0.5rem' }}>
+                Forgot Password Page
+              </Link>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+            {/* <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                   Current Password
@@ -389,7 +472,7 @@ const EditProfile = () => {
                   }}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Languages */}
