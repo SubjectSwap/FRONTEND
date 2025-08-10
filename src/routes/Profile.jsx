@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
 import CircularProgress from '../components/CircularProgress';
-import { BookOpen, Star, Languages, Mail, Calendar, MapPin } from 'lucide-react';
+import { BookOpen, Star, Languages, Mail, Calendar, MapPin, X } from 'lucide-react';
 
 const Profile = () => {
   const { id } = useParams();
@@ -11,6 +11,11 @@ const Profile = () => {
   const [profileUser, setProfileUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [ratingLoading, setRatingLoading] = useState(false);
+  const [personalityRating, setPersonalityRating] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [subjectRatings, setSubjectRatings] = useState({});
   
   const isOwnProfile = currentUser?.user?._id === id;
 
@@ -18,10 +23,122 @@ const Profile = () => {
     fetchUserProfile();
   }, [id]);
 
+  const handlePersonalityRating = async (rating) => {
+    try {
+      setRatingLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rating_routes/personality`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: profileUser._id,
+          rating: rating
+        })
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        throw new Error('Failed to update rating');
+      }
+    } catch (error) {
+      alert('Rating update failed');
+      console.error('Error updating rating:', error);
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
+  const handleTakeBackPersonalityRating = async () => {
+    try {
+      setRatingLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rating_routes/take_back/personality`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: profileUser._id
+        })
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        throw new Error('Failed to take back rating');
+      }
+    } catch (error) {
+      alert('Failed to take back rating');
+      console.error('Error taking back rating:', error);
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
+  const handleSubjectRating = async (subjectName, rating) => {
+    try {
+      setRatingLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rating_routes/subject`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: profileUser._id,
+          subjectName: subjectName,
+          rating: rating
+        })
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        throw new Error('Failed to update subject rating');
+      }
+    } catch (error) {
+      alert('Subject rating update failed');
+      console.error('Error updating subject rating:', error);
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
+  const handleTakeBackSubjectRating = async (subjectName) => {
+    try {
+      setRatingLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rating_routes/take_back/subject`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: profileUser._id,
+          subjectName: subjectName
+        })
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        throw new Error('Failed to take back subject rating');
+      }
+    } catch (error) {
+      alert('Failed to take back subject rating');
+      console.error('Error taking back subject rating:', error);
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/search/user/${id}`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -46,7 +163,7 @@ const Profile = () => {
     if (!rating || rating.totalRatings === 0) {
       return "No ratings yet";
     }
-    return (rating.average / rating.totalRatings).toFixed(2);
+    return (rating.average / rating.totalRatings)?.toFixed(2);
   };
 
   const renderSubjectRating = (subject) => {
@@ -55,7 +172,7 @@ const Profile = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           <Star size={14} color="#fbbf24" />
           <span style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {subject.selfRating.toFixed(2)} (self)
+            {subject.selfRating?.toFixed(2)} (self)
           </span>
         </div>
       );
@@ -64,7 +181,7 @@ const Profile = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           <Star size={14} color="#3b82f6" />
           <span style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
-            {(subject.totalReceivedRatings / subject.noOfRatings).toFixed(2)} ({subject.noOfRatings} reviews)
+            {(subject.totalReceivedRatings / subject.noOfRatings)?.toFixed(2)} ({subject.noOfRatings} reviews)
           </span>
         </div>
       );
@@ -159,21 +276,105 @@ const Profile = () => {
                 {profileUser?.username}
               </h1>
               
-              {profileUser?.email && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <Mail size={16} color="#6b7280" />
-                  <span style={{ color: '#6b7280' }}>{profileUser.email}</span>
-                </div>
-              )}
-              
               {/* Personality Rating */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                <Star size={20} color="#fbbf24" />
-                <span style={{ fontSize: '1.125rem', fontWeight: '500', color: '#374151' }}>
-                  Personality Rating: {renderPersonalityRating(profileUser?.personalityRating)}
-                </span>
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '0.75rem',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                padding: '1.5rem',
+                marginBottom: '2rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Personality Rating</p>
+                    <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
+                      {renderPersonalityRating(profileUser?.personalityRating)}
+                    </p>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>
+                      Rated by: {profileUser?.personalityRating?.totalRatings || 0}
+                    </p>
+                    {(currentUser && !isOwnProfile) && (
+                      <div style={{ marginTop: '1rem' }}>
+                        {currentUser.user.peopleIRated?.find(r => r.type === 'personality' && r.to === profileUser._id) ? (
+                          <div>
+                            <p style={{ fontSize: '0.875rem', color: '#374151', margin: '0.5rem 0' }}>
+                              Your Rating: {currentUser.user.peopleIRated.find(r => r.type === 'personality' && r.to === profileUser._id).rating}
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                              <input
+                                type="number"
+                                min="1"
+                                max="10"
+                                style={{ width: '60px', padding: '0.25rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                value={personalityRating}
+                                onChange={(e) => setPersonalityRating(e.target.value)}
+                              />
+                              <button
+                                onClick={() => handlePersonalityRating(personalityRating)}
+                                style={{
+                                  backgroundColor: '#2563eb',
+                                  color: 'white',
+                                  padding: '0.25rem 0.75rem',
+                                  borderRadius: '0.25rem',
+                                  border: 'none',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={handleTakeBackPersonalityRating}
+                                style={{
+                                  backgroundColor: '#ef4444',
+                                  color: 'white',
+                                  padding: '0.25rem 0.75rem',
+                                  borderRadius: '0.25rem',
+                                  border: 'none',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Take Back Rating
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <p style={{ fontSize: '0.875rem', color: '#374151', margin: '0.5rem 0' }}>
+                              You haven't rated yet.
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                              <input
+                                type="number"
+                                min="1"
+                                max="10"
+                                style={{ width: '60px', padding: '0.25rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                                value={personalityRating}
+                                onChange={(e) => setPersonalityRating(e.target.value)}
+                              />
+                              <button
+                                onClick={() => handlePersonalityRating(personalityRating)}
+                                style={{
+                                  backgroundColor: '#2563eb',
+                                  color: 'white',
+                                  padding: '0.25rem 0.75rem',
+                                  borderRadius: '0.25rem',
+                                  border: 'none',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Rate Now
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <Star size={32} color="#f59e0b" />
+                </div>
+                {ratingLoading && <CircularProgress />}
               </div>
-              
+
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 {isOwnProfile ? (
@@ -270,7 +471,7 @@ const Profile = () => {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {profileUser?.teachingSubjects && profileUser.teachingSubjects.length > 0 ? (
-                profileUser.teachingSubjects.map((subject, index) => (
+                profileUser.teachingSubjects.map((subject, index) => subject.active && (
                   <div
                     key={index}
                     style={{
@@ -284,7 +485,28 @@ const Profile = () => {
                       <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#047857', margin: 0 }}>
                         {subject.subjectName}
                       </h3>
-                      {renderSubjectRating(subject)}
+                      <div>
+                        {renderSubjectRating(subject)}
+                        {currentUser && 
+                          <button
+                            onClick={() => {
+                              setSelectedSubject(subject);
+                              setShowModal(true);
+                            }}
+                            style={{
+                              backgroundColor: '#2563eb',
+                              color: 'white',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '0.25rem',
+                              border: 'none',
+                              cursor: 'pointer',
+                              marginLeft: '0.5rem'
+                            }}
+                          >
+                            Rate
+                          </button>
+                      }
+                      </div>
                     </div>
                   </div>
                 ))
@@ -295,6 +517,7 @@ const Profile = () => {
               )}
             </div>
           </div>
+
 
           {/* Learning Subjects Section */}
           <div style={{
@@ -335,6 +558,176 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        {/* Modal for subjects */}
+          {showModal && selectedSubject && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '0.75rem',
+                padding: '2rem',
+                maxWidth: '500px',
+                width: '90%',
+                position: 'relative'
+              }}>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.5rem'
+                  }}
+                >
+                  <X color='black' size={24} />
+                </button>
+                
+                <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '1.5rem' }}>
+                  {selectedSubject.subjectName}
+                </h2>
+                
+                <div style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                    Self Rating
+                  </h3>
+                  <p style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb' }}>
+                    {selectedSubject.selfRating || 'Not rated'}
+                  </p>
+                </div>
+                
+                <div style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                    Community Rating
+                  </h3>
+                  <p style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb' }}>
+                    {selectedSubject.noOfRatings > 0 
+                      ? (selectedSubject.totalReceivedRatings / selectedSubject.noOfRatings)?.toFixed(2)
+                      : 'Not rated'}
+                  </p>
+                </div>
+                {(currentUser && !isOwnProfile) && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                      Your Rating
+                    </h3>
+                    {currentUser && currentUser.user.peopleIRated && currentUser.user.peopleIRated.find(r => 
+                      r.type === 'subject' && 
+                      r.subjectName === selectedSubject.subjectName && 
+                      r.to === profileUser._id
+                    ) ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <p style={{ fontSize: '1rem', color: '#374151' }}>
+                          Your current rating: {currentUser.user.peopleIRated.find(r => 
+                            r.type === 'subject' && 
+                            r.subjectName === selectedSubject.subjectName && 
+                            r.to === profileUser._id
+                          ).rating}
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            style={{ width: '60px', padding: '0.25rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                            value={subjectRatings[selectedSubject.subjectName] || ''}
+                            onChange={(e) => setSubjectRatings({
+                              ...subjectRatings,
+                              [selectedSubject.subjectName]: e.target.value
+                            })}
+                          />
+                          <button
+                            onClick={() => handleSubjectRating(selectedSubject.subjectName, subjectRatings[selectedSubject.subjectName])}
+                            style={{
+                              backgroundColor: '#2563eb',
+                              color: 'white',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '0.25rem',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => handleTakeBackSubjectRating(selectedSubject.subjectName)}
+                            style={{
+                              backgroundColor: '#ef4444',
+                              color: 'white',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '0.25rem',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Take Back
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <p style={{ fontSize: '1rem', color: '#374151' }}>
+                          Not rated yet.
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            style={{ width: '60px', padding: '0.25rem', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}
+                            value={subjectRatings[selectedSubject.subjectName] || ''}
+                            onChange={(e) => setSubjectRatings({
+                              ...subjectRatings,
+                              [selectedSubject.subjectName]: e.target.value
+                            })}
+                          />
+                          <button
+                            onClick={() => handleSubjectRating(selectedSubject.subjectName, subjectRatings[selectedSubject.subjectName])}
+                            style={{
+                              backgroundColor: '#2563eb',
+                              color: 'white',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '0.25rem',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Rate Now
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                    Rated by
+                  </h3>
+                  <p style={{ fontSize: '1rem', color: '#6b7280' }}>
+                    {selectedSubject.noOfRatings || 0} people
+                  </p>
+                </div>
+                
+                {ratingLoading && <CircularProgress />}
+              </div>
+            </div>
+          )}
+
       </div>
     </div>
   );

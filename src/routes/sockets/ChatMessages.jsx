@@ -20,7 +20,7 @@ function isPDF(url) {
 }
 
 function isTextFile(url) {
-  return /\.(txt|csv|md|json)$/i.test(url);
+  return /\.(txt)$/i.test(url);
 }
 
 import React from "react";
@@ -38,14 +38,14 @@ export default function ChatMessages({ messages, bottomRef }) {
         const baseStyle = {
           maxWidth: '70%',
           minWidth: 100,
-          marginBottom: 10,
+          marginBottom: 12,
           alignSelf: isMe ? 'flex-end' : 'flex-start',
-          background: isMe ? '#988bf8ff' : '#fff',
-          color: '#222',
-          borderRadius: 8,
-          padding: 10,
-          paddingBottom: 20,
-          boxShadow: '0 1px 2px #0001',
+          background: isMe ? '#e3f2fd' : '#ffffff',
+          color: '#333333',
+          borderRadius: 12,
+          padding: '12px 16px',
+          paddingBottom: 28,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
           position: 'relative',
           wordBreak: 'break-word'
         };
@@ -59,40 +59,72 @@ export default function ChatMessages({ messages, bottomRef }) {
                 key={`date-${msgDate}-${idx}`}
                 style={{
                   textAlign: 'center',
-                  margin: '18px 0 10px 0',
-                  color: '#fff',
+                  margin: '20px 0 12px 0',
+                  color: '#666666',
                   fontSize: 13,
                   fontWeight: 500,
-                  letterSpacing: 1,
-                  background: '#080cfbff',
-                  borderRadius: 8,
+                  background: '#f5f5f5',
+                  borderRadius: 20,
                   display: 'inline-block',
-                  padding: '2px 16px'
+                  padding: '4px 20px',
+                  alignSelf: 'center',
+                  width: 'auto'
                 }}
               >
                 {msgDate}
               </div>
             )}
+
             {msg.deleted ? (
-              <div key={`msg-${messageKey}`} style={{ ...baseStyle, fontStyle: 'italic', color: '#888', background: '#f0f0f0' }}>
+              <div key={`msg-${messageKey}`} style={{ 
+                ...baseStyle, 
+                fontStyle: 'italic', 
+                color: '#999999', 
+                background: '#f5f5f5',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+              }}>
                 This message is deleted
               </div>
             ) : msg.type === 'text' ? (
-              <div key={`msg-${messageKey}`} style={{ ...baseStyle, paddingBottom: 20 }}>
+              <div key={`msg-${messageKey}`} style={{ ...baseStyle, paddingBottom: 28 }}>
                 {msg.content}
                 <div style={{
-                  fontSize: 10, color: msg.byMe ? 'purple' : '#999', position: 'absolute', right: 8, bottom: 2
+                  fontSize: 11, 
+                  color: isMe ? '#666666' : '#999999', 
+                  position: 'absolute', 
+                  right: 12, 
+                  bottom: 8
                 }}>{formatTime(msg.timestamp)}</div>
               </div>
             ) : msg.type === 'file' ? (
-              <div key={`msg-${messageKey}`} style={{ ...baseStyle, background: isMe ? '#a7e5ffff' : '#f0ffeaff' }}>
-                <div style={{ height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8, background: '#f8f8f8', borderRadius: 6, overflow: 'hidden' }}>
+              <div key={`msg-${messageKey}`} style={{ 
+                ...baseStyle, 
+                background: isMe ? '#e8f5e9' : '#f5f5f5',
+                padding: '16px'
+              }}>
+                <div style={{ 
+                  height: 160, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  marginBottom: 12, 
+                  background: '#ffffff',
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}>
                   {isImage(msg.content) ? (
                     <a href={msg.content} target="_blank" rel="noopener noreferrer">
                       <img
                         src={msg.content}
                         alt="preview"
-                        style={{ maxHeight: 140, maxWidth: 180, display: 'block', objectFit: 'contain' }}
+                        style={{ 
+                          maxHeight: 160, 
+                          maxWidth: 200, 
+                          display: 'block', 
+                          objectFit: 'contain',
+                          borderRadius: 4
+                        }}
                       />
                     </a>
                   ) : isPDF(msg.content) ? (
@@ -101,10 +133,10 @@ export default function ChatMessages({ messages, bottomRef }) {
                         src={msg.content}
                         type="application/pdf"
                         width="100%"
-                        height="120"
-                        style={{ maxWidth: 180, border: 'none', background: '#fff' }}
+                        height="140"
+                        style={{ maxWidth: 200, border: 'none', background: '#fff', borderRadius: 4 }}
                       />
-                      <div style={{ fontSize: 13, color: '#1976d2', marginTop: 4 }}>Preview PDF</div>
+                      <div style={{ fontSize: 13, color: '#1976d2', marginTop: 6, fontWeight: 500 }}>Preview PDF</div>
                     </a>
                   ) : isTextFile(msg.content) ? (
                     <a href={msg.content} target="_blank" rel="noopener noreferrer" style={{ width: '100%', textAlign: 'center' }}>
@@ -112,13 +144,13 @@ export default function ChatMessages({ messages, bottomRef }) {
                         src={msg.content}
                         type="text/plain"
                         width="100%"
-                        height="120"
-                        style={{ maxWidth: 180, border: 'none', background: '#fff' }}
+                        height="140"
+                        style={{ maxWidth: 200, border: 'none', background: '#fff', borderRadius: 4 }}
                       />
-                      <div style={{ fontSize: 13, color: '#1976d2', marginTop: 4 }}>Preview Text</div>
+                      <div style={{ fontSize: 13, color: '#1976d2', marginTop: 6, fontWeight: 500 }}>Preview Text</div>
                     </a>
                   ) : (
-                    <div style={{ color: '#888', fontSize: 13, textAlign: 'center', width: '100%' }}>
+                    <div style={{ color: '#999999', fontSize: 13, textAlign: 'center', width: '100%', padding: '20px' }}>
                       No preview available
                     </div>
                   )}
@@ -127,12 +159,24 @@ export default function ChatMessages({ messages, bottomRef }) {
                   href={msg.content}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#1976d2', textDecoration: 'underline', fontWeight: 500 }}
+                  style={{ 
+                    color: '#1976d2', 
+                    textDecoration: 'none',
+                    fontWeight: 500,
+                    fontSize: 14,
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '8px 0'
+                  }}
                 >
-                  <em>A certain .{getFileExtension(msg.content)} file shared</em>
+                  A certain .{getFileExtension(msg.content)} file shared
                 </a>
                 <div style={{
-                  fontSize: 10, color: msg.byMe ? 'black' : '#999', position: 'absolute', right: 8, bottom: 2
+                  fontSize: 11, 
+                  color: isMe ? '#666666' : '#999999', 
+                  position: 'absolute', 
+                  right: 12, 
+                  bottom: 8
                 }}>{formatTime(msg.timestamp)}</div>
               </div>
             ) : null}

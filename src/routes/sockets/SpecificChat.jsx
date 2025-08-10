@@ -102,16 +102,33 @@ export default function SpecificChat({ socket, to, keyPair, publicKeyB64 }) {
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', background: loading || '#f0e6feff', minHeight: '100vh'
+      display: 'flex',
+      flexDirection: 'column',
+      background: '#ffffff',
+      minHeight: '100vh',
+      boxShadow: '0 0 20px rgba(0,0,0,0.05)'
     }}>
       {/* Modal for disconnect */}
       {showDisconnected && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-          background: 'rgba(255, 255, 255, 0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(255, 255, 255, 0.9)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
           <div style={{
-            background: '#fff', padding: 32, borderRadius: 8, boxShadow: '0 2px 8px #0002'
+            background: '#ffffff',
+            padding: '2rem',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            maxWidth: '400px',
+            textAlign: 'center'
           }}>
             <h2>Disconnected</h2>
             <p>WebSocket connection lost. Please refresh or try again later.</p>
@@ -121,8 +138,16 @@ export default function SpecificChat({ socket, to, keyPair, publicKeyB64 }) {
       {/* Between sending of messages */}
       {isAMessageBeingSent && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-          background: 'rgba(255, 255, 255, 0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(255, 255, 255, 0.8)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
           <CircularProgress />
         </div>
@@ -130,15 +155,26 @@ export default function SpecificChat({ socket, to, keyPair, publicKeyB64 }) {
       {/* Archiving */}
       {archived && (
         <div style={{
-          background: '#cbeafdff', color: '#721c24', padding: 12, textAlign: 'center',
-          fontSize: 14, fontWeight: 500, borderBottom: '1px solid #f5c6cb'
+          background: '#e3f2fd',
+          color: '#1565c0',
+          padding: '1rem',
+          textAlign: 'center',
+          fontSize: '14px',
+          fontWeight: 500,
+          borderBottom: '1px solid #bbdefb'
         }}>
           Previous Conversations have been archived.
         </div>
       )}
       {/* Messages */}
       <div style={{
-        flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', marginBottom: 10,
+        flex: 1,
+        overflowY: 'auto',
+        padding: '1.5rem',
+        display: 'flex',
+        flexDirection: 'column',
+        marginBottom: '4rem',
+        background: '#fafafa'
       }}>
         {loading
           ? <CircularProgress size={32} />

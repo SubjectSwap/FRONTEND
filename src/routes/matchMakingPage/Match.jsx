@@ -151,7 +151,7 @@ export default function Match() {
     if (!rating || rating.totalRatings === 0) {
       return "No info yet";
     }
-    return (rating.average / rating.totalRatings).toFixed(2);
+    return (rating.average / rating.totalRatings)?.toFixed(2);
   };
 
   return (
@@ -413,7 +413,7 @@ export default function Match() {
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                       {candidate.teachingSubjects && candidate.teachingSubjects.length > 0 ? (
-                        candidate.teachingSubjects.map((subject, index) => (
+                        candidate.teachingSubjects.map((subject, index) => subject.active && (
                           <span 
                             key={index}
                             style={{
@@ -429,12 +429,12 @@ export default function Match() {
                             {subject.totalReceivedRatings < 10  ? (<>
                               <div style={{marginLeft: '0.3rem'}}>
                                 <Star size={11} /> 
-                                <b>{(subject.selfRating).toFixed(2)}</b>
+                                <b>{(subject.selfRating)?.toFixed(2)}</b>
                               </div>
                             </>) : ( 
                               <div style={{marginLeft: '0.3rem'}}>
                                 <Star color='blue' size={11} /> 
-                                <b>{(subject.totalReceivedRatings / subject.noOfRatings).toFixed(2)}</b>
+                                <b>{(subject.totalReceivedRatings / subject.noOfRatings)?.toFixed(2)}</b>
                               </div>
                           )}
                           </span>

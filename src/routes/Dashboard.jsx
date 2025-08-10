@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthProvider';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Users, MessageCircle, Star, TrendingUp, Calendar, Search } from 'lucide-react';
+import { BookOpen, Users, MessageCircle, Star, TrendingUp, Calendar, Search, X } from 'lucide-react';
 import CircularProgress from '../components/CircularProgress';
 
 const Dashboard = () => {
@@ -15,7 +15,8 @@ const Dashboard = () => {
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -90,6 +91,12 @@ const Dashboard = () => {
                 <p style={{ color: '#6b7280', marginTop: '0.5rem', fontSize: '1.125rem' }}>
                   Ready to learn and teach today?
                 </p>
+                <h2 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
+                  Description
+                </h2>
+                <p style={{ color: '#6b7280', marginTop: '0.2rem', fontSize: '1.125rem' }}>
+                  {user?.user?.description || <em>No description yet.</em>}
+                </p>
               </div>
             </div>
             <Link to="/match">
@@ -121,21 +128,8 @@ const Dashboard = () => {
           gap: '1.5rem',
           marginBottom: '2rem'
         }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            padding: '1.5rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Total Matches</p>
-                <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>{stats.totalMatches}</p>
-              </div>
-              <Users size={32} color="#2563eb" />
-            </div>
-          </div>
 
+          {/* Personality Rating */}
           <div style={{
             backgroundColor: 'white',
             borderRadius: '0.75rem',
@@ -144,38 +138,13 @@ const Dashboard = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Active Chats</p>
-                <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>{stats.activeChats}</p>
-              </div>
-              <MessageCircle size={32} color="#10b981" />
-            </div>
-          </div>
-
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            padding: '1.5rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Completed Sessions</p>
-                <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>{stats.completedSessions}</p>
-              </div>
-              <TrendingUp size={32} color="#8b5cf6" />
-            </div>
-          </div>
-
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            padding: '1.5rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Average Rating</p>
-                <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>{stats.averageRating}/10</p>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Personality Rating</p>
+                <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
+                  {user.user.personalityRating.totalRatings == 0 ? "Yet to be rated" : (user.user.personalityRating.average/user.user.personalityRating.totalRatings)?.toFixed(2)}
+                </p>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>
+                  Rated by: {user.user.personalityRating.totalRatings || 0}
+                </p>
               </div>
               <Star size={32} color="#f59e0b" />
             </div>
@@ -224,6 +193,36 @@ const Dashboard = () => {
                 <div>
                   <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', margin: 0 }}>Find New Matches</h3>
                   <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Discover learning partners</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate('/search')}
+                style={{
+                  backgroundColor: '#f3f4f6',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0.5rem',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#e5e7eb';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#f3f4f6';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <Search size={20} color="#ff0000ff" />
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', margin: 0 }}>Search for people</h3>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>View Profiles of other people</p>
                 </div>
               </button>
 
@@ -288,7 +287,7 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-
+                
           {/* Your Subjects */}
           <div style={{
             backgroundColor: 'white',
@@ -303,36 +302,44 @@ const Dashboard = () => {
             <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#10b981', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <BookOpen size={16} />
-                Teaching ({user?.user?.teachingSubjects?.length || 0})
+                Teaching ({user?.user?.teachingSubjects?.filter(subject => subject.active)?.length || 0})
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {user?.user?.teachingSubjects && user.user.teachingSubjects.length > 0 ? (
-                  user.user.teachingSubjects.slice(0, 3).map((subject, index) => (
+                  user.user.teachingSubjects.map((subject, index) => { return subject.active && (
                     <span
                       key={index}
+                      onClick={() => {
+                        setSelectedSubject(subject);
+                        setShowModal(true);
+                      }}
                       style={{
                         backgroundColor: '#d1fae5',
                         color: '#047857',
                         padding: '0.25rem 0.75rem',
                         borderRadius: '9999px',
                         fontSize: '0.75rem',
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#a7f3d0';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#d1fae5';
                       }}
                     >
                       {subject.subjectName}
                     </span>
-                  ))
+                  ) })
                 ) : (
                   <span style={{ fontSize: '0.875rem', color: '#6b7280', fontStyle: 'italic' }}>
                     No teaching subjects yet
                   </span>
                 )}
-                {user?.user?.teachingSubjects && user.user.teachingSubjects.length > 3 && (
-                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                    +{user.user.teachingSubjects.length - 3} more
-                  </span>
-                )}
               </div>
+
             </div>
 
             <div>
@@ -342,7 +349,7 @@ const Dashboard = () => {
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {user?.user?.learningSubjects && user.user.learningSubjects.length > 0 ? (
-                  user.user.learningSubjects.slice(0, 3).map((subject, index) => (
+                  user.user.learningSubjects.map((subject, index) => (
                     <span
                       key={index}
                       style={{
@@ -362,141 +369,86 @@ const Dashboard = () => {
                     No learning subjects yet
                   </span>
                 )}
-                {user?.user?.learningSubjects && user.user.learningSubjects.length > 3 && (
-                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                    +{user.user.learningSubjects.length - 3} more
-                  </span>
-                )}
               </div>
+
             </div>
           </div>
 
-          {/* Recent Activity */}
+        </div>
+
+        {/* Modal to display detailed ratings of subjects */}
+        {showModal && selectedSubject && (
           <div style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            padding: '1.5rem'
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
           }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#374151', marginBottom: '1.5rem' }}>
-              Recent Activity
-            </h2>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {recentActivity.length > 0 ? (
-                recentActivity.map((activity, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'start',
-                      gap: '0.75rem',
-                      padding: '0.75rem',
-                      backgroundColor: '#f9fafb',
-                      borderRadius: '0.5rem',
-                      border: '1px solid #f3f4f6'
-                    }}
-                  >
-                    <div style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: activity.type === 'match' ? '#2563eb' : 
-                                     activity.type === 'chat' ? '#10b981' : '#8b5cf6',
-                      marginTop: '0.375rem'
-                    }} />
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: '0.875rem', color: '#374151', margin: '0 0 0.25rem 0' }}>
-                        {activity.message}
-                      </p>
-                      <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>
-                        {activity.time}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div style={{ textAlign: 'center', padding: '2rem' }}>
-                  <Calendar size={48} color="#9ca3af" style={{ margin: '0 auto 1rem' }} />
-                  <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>No recent activity</p>
-                  <p style={{ color: '#9ca3af', fontSize: '0.75rem' }}>Start matching to see your activity here</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Learning Progress */}
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            padding: '1.5rem'
-          }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#374151', marginBottom: '1.5rem' }}>
-              Learning Progress
-            </h2>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ 
-                padding: '1rem',
-                backgroundColor: '#fef3c7',
-                borderRadius: '0.5rem',
-                border: '1px solid #fed7aa'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#92400e' }}>This Week</span>
-                  <span style={{ fontSize: '0.75rem', color: '#92400e' }}>5 hours</span>
-                </div>
-                <div style={{ 
-                  width: '100%', 
-                  height: '8px', 
-                  backgroundColor: '#fde68a',
-                  borderRadius: '4px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{ 
-                    width: '60%', 
-                    height: '100%', 
-                    backgroundColor: '#f59e0b',
-                    borderRadius: '4px'
-                  }} />
-                </div>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '0.75rem',
+              padding: '2rem',
+              maxWidth: '500px',
+              width: '90%',
+              position: 'relative'
+            }}>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0.5rem'
+                }}
+              >
+                <X color='black' size={24} />
+              </button>
+              
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#1f2937', marginBottom: '1.5rem' }}>
+                {selectedSubject.subjectName}
+              </h2>
+              
+              <div style={{ marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Self Rating
+                </h3>
+                <p style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb' }}>
+                  {selectedSubject.selfRating || 'Not rated'}
+                </p>
               </div>
-
-              <div style={{ 
-                padding: '1rem',
-                backgroundColor: '#dbeafe',
-                borderRadius: '0.5rem',
-                border: '1px solid #bfdbfe'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#1e40af' }}>This Month</span>
-                  <span style={{ fontSize: '0.75rem', color: '#1e40af' }}>18 hours</span>
-                </div>
-                <div style={{ 
-                  width: '100%', 
-                  height: '8px', 
-                  backgroundColor: '#93c5fd',
-                  borderRadius: '4px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{ 
-                    width: '75%', 
-                    height: '100%', 
-                    backgroundColor: '#2563eb',
-                    borderRadius: '4px'
-                  }} />
-                </div>
+              
+              <div style={{ marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Community Rating
+                </h3>
+                <p style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2563eb' }}>
+                  {selectedSubject.noOfRatings > 0 
+                    ? (selectedSubject.totalReceivedRatings / selectedSubject.noOfRatings)?.toFixed(2)
+                    : 'Not rated'}
+                </p>
               </div>
-
-              <div style={{ textAlign: 'center', padding: '1rem' }}>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                  Keep up the great work! 🎉
+              
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Rated by
+                </h3>
+                <p style={{ fontSize: '1rem', color: '#6b7280' }}>
+                  {selectedSubject.noOfRatings || 0} people
                 </p>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
       </div>
     </div>
   );

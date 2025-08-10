@@ -46,7 +46,7 @@ export default function ChatHeader() {
   return (
     <div style={{
       borderRadius: 14,
-            border: '4px solid #2b0085ff', color: 'black', padding: 4, fontWeight: 600, fontSize: 18, justifyContent: 'left', display: 'flex', position: 'sticky', marginTop: '1rem', zIndex: 300
+            border: '1px solid #2b0085ff', color: 'black', padding: 4, fontWeight: 600, fontSize: 18, justifyContent: 'left', display: 'flex', position: 'sticky', marginTop: '1rem', zIndex: 300
           }}>
             <button onClick={() => navigate(-1)} style={{
               background: 'none', border: 'none', color: '#000', fontSize: 18, marginRight: 12, cursor: 'pointer'

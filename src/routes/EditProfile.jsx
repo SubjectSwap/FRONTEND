@@ -133,6 +133,7 @@ const EditProfile = () => {
         ...prev,
         teachingSubjects: [...prev.teachingSubjects, newSubject]
       }));
+      console.log(formData.teachingSubjects);
       setNewTeachingSubject('');
       setNewTeachingRating(5);
     }
@@ -188,14 +189,6 @@ const EditProfile = () => {
       }
       
       setSuccess('Profile updated successfully!');
-      
-      // Clear password fields
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
 
       // Reload the page if successful
       window.location.reload();
@@ -386,8 +379,8 @@ const EditProfile = () => {
             </div>
           </div>
 
-          {/* Password Change */}
-          <div style={{
+          {/* Password Change - Temporaryly Disabled */}
+          {/* <div style={{
             backgroundColor: 'white',
             borderRadius: '0.75rem',
             boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
@@ -405,75 +398,7 @@ const EditProfile = () => {
                 Forgot Password Page
               </Link>
             </div>
-
-            {/* <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleInputChange}
-                  placeholder="Leave blank to keep current password"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.5rem',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleInputChange}
-                  placeholder="Enter new password"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.5rem',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm new password"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.5rem',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-            </div> */}
-          </div>
+          </div> */}
 
           {/* Languages */}
           <div style={{

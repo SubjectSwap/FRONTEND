@@ -36,12 +36,34 @@ export default function ChatInput({ onSend, disabled }) {
 
   return (
     
-  <div style={{ borderTop: '1px solid #ddd', background: '#f7f7f7ff', padding: 8, position: 'fixed', width: '100%', bottom: 0  }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8}}>
+  <div style={{ 
+    borderTop: '1px solid #e0e0e0', 
+    background: '#ffffff', 
+    padding: '16px', 
+    position: 'fixed', 
+    width: '100%', 
+    bottom: 0,
+    boxShadow: '0 -2px 8px rgba(0,0,0,0.05)'
+  }}>
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: '12px',
+      maxWidth: '800px',
+      margin: '0 auto'
+    }}>
       <button
         onClick={() => setMode(mode === 'text' ? 'file' : 'text')}
         style={{
-          background: '#010c6fff', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer'
+          background: '#f5f5f5',
+          color: '#333333',
+          border: '1px solid #e0e0e0',
+          borderRadius: '8px',
+          padding: '8px 16px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 500,
+          transition: 'all 0.2s ease'
         }}
         type="button"
         disabled={disabled || sending}
@@ -55,7 +77,13 @@ export default function ChatInput({ onSend, disabled }) {
           onChange={e => setText(e.target.value)}
           placeholder="Type a message"
           style={{
-            flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc'
+            flex: 1,
+            padding: '10px 16px',
+            borderRadius: '8px',
+            border: '1px solid #e0e0e0',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'border-color 0.2s ease'
           }}
           disabled={disabled || sending}
           onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
@@ -64,14 +92,28 @@ export default function ChatInput({ onSend, disabled }) {
         <input
           type="file"
           onChange={e => setFile(e.target.files[0])}
-          style={{ flex: 1 }}
+          style={{ 
+            flex: 1,
+            padding: '8px',
+            borderRadius: '8px',
+            border: '1px solid #e0e0e0',
+            fontSize: '14px'
+          }}
           disabled={disabled || sending}
         />
       )}
       <button
         onClick={handleSend}
         style={{
-          background: '#000638ff', color: '#fff', border: 'none', borderRadius: 4, padding: '8px 16px', cursor: 'pointer'
+          background: '#2196f3',
+          color: '#ffffff',
+          border: 'none',
+          borderRadius: '8px',
+          padding: '10px 24px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 500,
+          transition: 'background-color 0.2s ease'
         }}
         type="button"
         disabled={disabled || sending || (mode === 'text' ? !text.trim() : !file)}
