@@ -39,18 +39,21 @@ export default function ChatInput({ onSend, disabled }) {
   <div style={{ 
     borderTop: '1px solid #e0e0e0', 
     background: '#ffffff', 
-    padding: '16px', 
-    position: 'fixed', 
-    width: '100%', 
+    padding: '12px',
+    position: 'fixed',
+    left: 0,
+    right: 0,
     bottom: 0,
     boxShadow: '0 -2px 8px rgba(0,0,0,0.05)'
   }}>
     <div style={{ 
       display: 'flex', 
       alignItems: 'center', 
-      gap: '12px',
+      gap: '8px',
+      width: '100%',
       maxWidth: '800px',
-      margin: '0 auto'
+      margin: '0 auto',
+      padding: '0 4px'
     }}>
       <button
         onClick={() => setMode(mode === 'text' ? 'file' : 'text')}

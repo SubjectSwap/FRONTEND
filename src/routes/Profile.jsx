@@ -179,7 +179,7 @@ const Profile = () => {
     if (subject.totalReceivedRatings < 10) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <Star size={14} color="#fbbf24" />
+          <Star size={14} color="#047857" />
           <span style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
             {subject.selfRating?.toFixed(2)} (self)
           </span>
@@ -503,13 +503,15 @@ const Profile = () => {
                               setShowModal(true);
                             }}
                             style={{
-                              backgroundColor: '#2563eb',
+                              backgroundColor: '#047857',
                               color: 'white',
                               padding: '0.25rem 0.75rem',
                               borderRadius: '0.25rem',
                               border: 'none',
                               cursor: 'pointer',
-                              marginLeft: '0.5rem'
+                              marginLeft: '0.5rem',
+                              transition: 'background-color 0.2s',
+                              marginTop: '0.7rem'
                             }}
                           >
                             Rate
