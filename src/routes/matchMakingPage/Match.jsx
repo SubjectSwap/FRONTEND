@@ -130,7 +130,8 @@ export default function Match() {
         },
         body: JSON.stringify({
           wantSubject: selectedSubject,
-          mySubjects: user.user.teachingSubjects
+          mySubjects: user.user.teachingSubjects,
+          token: localStorage.getItem('token')
         }),
       });
 

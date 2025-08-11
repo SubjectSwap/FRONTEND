@@ -16,7 +16,13 @@ function ListChats() {
     setError('');
     fetch(import.meta.env.VITE_BACKEND_URL + '/chat/previous_chats', {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        token: localStorage.getItem('token')
+      })
     })
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch chats');

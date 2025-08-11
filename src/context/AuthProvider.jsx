@@ -15,13 +15,20 @@ export const AuthProvider = ({ children }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const fetchUser = async () => {
+    console.log(localStorage.getItem('token'));
     setLoading(true);
     setError('');
     try {
       const res = await fetch(`${backendUrl}/verify-user`, {
         method: 'POST',
         credentials: 'include',
-        accessControlAllowCredentials: true
+        accessControlAllowCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          token: localStorage.getItem('token')
+        })
       });
       if (!res.ok) throw new Error('Not authenticated');
       const data = await res.json();
@@ -60,7 +67,8 @@ export const AuthProvider = ({ children }) => {
         let date = new Date();
         date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
         const expires = "expires=" + date.toUTCString();
-        document.cookie = `SubjectSwapLoginJWT=${resData.token}; path=/; SameSite=None; Secure; Path=/; ${expires}`;
+        document.cookie = `SubjectSwapLoginJWT=${resData.token}; path=/*; SameSite=None; Secure; ${expires};`;
+        localStorage.setItem('token', resData.token);
         setError('');
       }
     } catch (err) {
@@ -75,6 +83,7 @@ export const AuthProvider = ({ children }) => {
     //   await fetch(`${backendUrl}/logout`, { method: 'POST', credentials: 'include' });
     // } catch {}
     document.cookie = 'SubjectSwapLoginJWT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    localStorage.clear();
     setUser(null);
     navigate('/login');
   };

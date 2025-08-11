@@ -31,7 +31,8 @@ export default function ConnectChat() {
       if (parts.length === 2) return parts.pop().split(';').shift();
       return '';
     };
-    const token = getCookie('SubjectSwapLoginJWT');
+    // const token = getCookie('SubjectSwapLoginJWT');
+    const token = localStorage.getItem("token");
 
     // Connect to socket.io server with cookie/token
     const socketInstance = io(import.meta.env.VITE_BACKEND_URL + '/private_chat', {

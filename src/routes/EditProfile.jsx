@@ -173,7 +173,7 @@ const EditProfile = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({...updateData, token: localStorage.getItem('token')}),
       });
 
       if (!response.ok) {

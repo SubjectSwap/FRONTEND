@@ -17,7 +17,7 @@ export default function ChatHeader() {
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ uuid }),
+                body: JSON.stringify({ uuid, token: localStorage.getItem('token') }),
             })
             .then((response) => response.json())
             .then((data) => {

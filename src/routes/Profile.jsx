@@ -34,7 +34,8 @@ const Profile = () => {
         },
         body: JSON.stringify({
           to: profileUser._id,
-          rating: rating
+          rating: rating,
+          token: localStorage.getItem('token')
         })
       });
 
@@ -61,7 +62,8 @@ const Profile = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          to: profileUser._id
+          to: profileUser._id,
+          token: localStorage.getItem('token')
         })
       });
 
@@ -90,7 +92,8 @@ const Profile = () => {
         body: JSON.stringify({
           to: profileUser._id,
           subjectName: subjectName,
-          rating: rating
+          rating: rating,
+          token: localStorage.getItem('token')
         })
       });
 
@@ -118,7 +121,8 @@ const Profile = () => {
         },
         body: JSON.stringify({
           to: profileUser._id,
-          subjectName: subjectName
+          subjectName: subjectName,
+          token: localStorage.getItem('token')
         })
       });
 
@@ -144,6 +148,9 @@ const Profile = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          token: localStorage.getItem('token')
+        })
       });
 
       if (!response.ok) {

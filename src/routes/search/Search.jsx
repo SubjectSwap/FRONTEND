@@ -23,7 +23,7 @@ const Search = () => {
             'Content-Type': 'application/json'
           },
           credentials: 'include',
-          body: JSON.stringify({ query: searchTerm })
+          body: JSON.stringify({ query: searchTerm, token: localStorage.getItem('token') })
         });
         const data = await response.json();
         setSearchResults(data);
