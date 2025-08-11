@@ -24,6 +24,7 @@ const Profile = () => {
   }, [id]);
 
   const handlePersonalityRating = async (rating) => {
+    if(rating<0 || rating>10) return;
     try {
       setRatingLoading(true);
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rating_routes/personality`, {
@@ -81,6 +82,7 @@ const Profile = () => {
   };
 
   const handleSubjectRating = async (subjectName, rating) => {
+    if(rating<0 || rating>10) return;
     try {
       setRatingLoading(true);
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rating_routes/subject`, {

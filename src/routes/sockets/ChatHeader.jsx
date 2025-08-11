@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import CircularProgress from '../../components/CircularProgress';
 
 export default function ChatHeader() {
@@ -54,12 +54,13 @@ export default function ChatHeader() {
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8
             }}>
+              
+              <Link style={{ color: 'black', textDecoration: 'none', fontWeight: 600, fontSize: 18, verticalAlign: 'middle'}} to={`/profile/${to}`}>
               <img
                 src={profilePic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name)}
                 alt={name}
                 style={{ width: 36, height: 36, borderRadius: '50%', marginRight: 8, verticalAlign: 'middle' }}
-              />
-              {name}
+              />{name}</Link>
             </div>
           </div>
   )
