@@ -57,7 +57,10 @@ export const AuthProvider = ({ children }) => {
         throw new Error(resData.message || 'Incorrect email or password');
       } else {
         setUser(resData);
-        document.cookie = `SubjectSwapLoginJWT=${resData.token}; path=/`;
+        let date = new Date();
+        date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = `SubjectSwapLoginJWT=${resData.token}; path=/; SameSite=None; Secure; Path=/; ${expires}`;
         setError('');
       }
     } catch (err) {
